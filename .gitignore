@@ -1,0 +1,8 @@
+#env files except backup
+*.env
+!.env.backup
+
+# cache files
+*__pycache__/*
+*.pyc
+*.sqlite3
