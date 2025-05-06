@@ -1,8 +1,14 @@
 #env files except backup
 *.env
 !.env.backup
-
-# cache files
-*__pycache__/*
+*.log
 *.pyc
 *.sqlite3
+# cache files
+*__pycache__/*
+*.egg-info/
+*.egg
+*.db
+*.DS_Store
+*.coverage
+*.coverage.*

@@ -3,12 +3,19 @@ from .models import Aluno, Mensalidade, ReguaCobranca
 import re
 
 class AlunoAdmin(admin.ModelAdmin):
-  def get_list_display(self, request):
-    # Obter todos os campos do modelo
-    all_fields = [field.name for field in self.model._meta.fields]
-    # Substituir 'whatsapp' por 'whatsapp_formatado'
-    fields = ['whatsapp_formatado' if f == 'whatsapp' else f for f in all_fields]
-    return fields
+
+  list_display = (
+    "username",
+    "whatsapp",
+    "is_staff",
+    "contrato",
+    "status_contrato",
+    "preço",
+    "dia_vencimento",
+    "is_active"
+  )
+  #list_filter = ("username", "whatsapp", "is_active")
+  
   
   def whatsapp_formatado(self, obj):
     phone_number = re.sub(r'\D', '', obj.whatsapp)

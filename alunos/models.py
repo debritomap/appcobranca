@@ -43,7 +43,7 @@ class Dia(models.Model):
 
 class Aluno(AbstractUser):
     username = models.CharField(max_length=150, unique=True)
-    whatsapp = models.CharField(max_length=15, null=True, blank=True)
+    whatsapp = models.CharField(max_length=15, unique=True)
     is_staff = models.BooleanField(default=False)
     contrato = models.FileField(upload_to="contratos/", null=True, blank=True)
     status_contrato = models.CharField(max_length=50, choices=[
@@ -52,12 +52,14 @@ class Aluno(AbstractUser):
         ('assinado', 'Assinado'),
         ('inativo', 'Inativo'),
     ], default='pendente')
-    preço = models.DecimalField(max_digits=10, decimal_places=2)
-    dia_vencimento = models.ForeignKey(Dia, on_delete=models.CASCADE)
+    aulas_contratadas = models.IntegerField(default=0)
+    aulas_realizadas = models.IntegerField(default=0)
+    preço = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    dia_vencimento = models.ForeignKey(Dia, on_delete=models.CASCADE, null=True)
     is_active = models.BooleanField(default=True)
 
-    USERNAME_FIELD = "username"
-    REQUIRED_FIELDS = ["whatsapp", "preço", "dia_vencimento"]
+    USERNAME_FIELD = "whatsapp"
+    REQUIRED_FIELDS = ["username", "preço", "dia_vencimento"]
 
     def __str__(self):
         return self.username
@@ -73,6 +75,7 @@ class Mensalidade(models.Model):
       ('atrasado', 'Atrasado'),
       ('inativo', 'Inativo'),
   ], default='pendente')
+  comprovante = models.FileField(upload_to="comprovantes/", null=True, blank=True)
   data_pagamento = models.DateField(null=True, blank=True)
 
 
@@ -83,4 +86,4 @@ class ReguaCobranca(models.Model):
     dia_cobranca = models.ForeignKey(Dia, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"Regua de Cobrança: -{self.dia_cobranca}"
+        return f"{-self.dia_cobranca} dias antes do vencimento"

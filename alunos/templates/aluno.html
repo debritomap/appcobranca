@@ -1,0 +1,429 @@
+<!-- aluno/templates/aluno.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área do Aluno</title>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #3b8e3f;
+            --primary-light: #e8f5e9;
+            --danger: #f44336;
+            --warning: #ff9800;
+            --light-gray: #f9f9f9;
+            --border: #eaeaea;
+            --text: #333;
+            --text-light: #666;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: #ffffff;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .card {
+            background-color: var(--light-gray);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .info-item {
+            background-color: white;
+            border-radius: 6px;
+            padding: 15px;
+            box-shadow: var(--shadow);
+        }
+        
+        .info-item p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        
+        .info-item h4 {
+            margin-top: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        /* Tabela responsiva */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+            background-color: white;
+            border: 1px solid var(--border);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background-color: var(--light-gray);
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background-color: var(--light-gray);
+        }
+        
+        /* Status badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-pendente {
+            background-color: #fff3e0;
+            color: var(--warning);
+            border: 1px solid #ffe0b2;
+        }
+        
+        .badge-pago {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border: 1px solid #c8e6c9;
+        }
+        
+        .badge-atrasado {
+            background-color: #ffebee;
+            color: var(--danger);
+            border: 1px solid #ffcdd2;
+        }
+        
+        /* Coluna de comprovante */
+        .file-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .comprovante-link {
+            display: inline-flex;
+            align-items: center;
+            color: #2196F3;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .comprovante-link:before {
+            content: "📄";
+            margin-right: 6px;
+        }
+        
+        .comprovante-link:hover {
+            text-decoration: underline;
+        }
+        
+        .file-upload {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .file-upload input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .upload-btn-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .file-name {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+            display: none;
+        }
+        
+        /* Mensagem sem registros */
+        .sem-registros {
+            background-color: var(--light-gray);
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-light);
+            font-style: italic;
+            border: 1px solid var(--border);
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            th, td {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Olá, {{ aluno.username }}!</h1>
+            <a href="{% url 'logout' %}" class="btn btn-danger">Sair</a>
+        </div>
+
+        <div class="card">
+            <h3>Informações da Conta</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <p>WhatsApp</p>
+                    <h4 id="whatsapp-display">{{ aluno.whatsapp }}</h4>
+                    <script>
+                      document.addEventListener('DOMContentLoaded', function() {
+                        const element = document.getElementById('whatsapp-display');
+                        const number = element.textContent.trim();
+                        
+                        if(number && number.length >= 10) {
+                          // Remove any non-numeric characters
+                          const cleaned = number.replace(/\D/g, '');
+                          
+                          // Format as (XX) 9XXXX-XXXX or (XX) XXXX-XXXX
+                          if(cleaned.length === 11) {
+                            element.textContent = `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 7)}-${cleaned.substring(7)}`;
+                          } else if(cleaned.length === 10) {
+                            element.textContent = `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 6)}-${cleaned.substring(6)}`;
+                          }
+                        }
+                      });
+                    </script>
+                </div>
+                <div class="info-item">
+                    <p>Vencimento</p>
+                    <h4>{{ aluno.dia_vencimento|date:"d/m/Y" }}</h4>
+                </div>
+                <div class="info-item">
+                    <p>Aulas Contratadas</p>
+                    <h4>{{ aluno.aulas_contratadas }}</h4>
+                </div>
+                <div class="info-item">
+                    <p>Aulas Realizadas</p>
+                    <h4>{{ aluno.aulas_realizadas }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <h2 style="margin: 20px 0 10px 0; color: var(--text);">Mensalidades</h2>
+        
+        {% if mensalidades %}
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Valor</th>
+                            <th>Vencimento</th>
+                            <th>Status</th>
+                            <th>Pagamento</th>
+                            <th>Comprovante</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mensalidade in mensalidades %}
+                        <tr>
+                            <td>{{ mensalidade.id }}</td>
+                            <td>R$ {{ mensalidade.valor }}</td>
+                            <td>{{ mensalidade.data_vencimento|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if mensalidade.status == 'pendente' %}
+                                    <span class="badge badge-pendente">Pendente</span>
+                                {% elif mensalidade.status == 'pago' %}
+                                    <span class="badge badge-pago">Pago</span>
+                                {% elif mensalidade.status == 'atrasado' %}
+                                    <span class="badge badge-atrasado">Atrasado</span>
+                                {% elif mensalidade.status == 'pago_com_atraso' %}
+                                    <span class="badge badge-pago">Pago com atraso</span>
+                                {% elif mensalidade.status == 'cancelado' %}
+                                    <span class="badge">Cancelado</span>
+                                {% else %}
+                                    <span class="badge">Inativo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if mensalidade.data_pagamento %}
+                                    {{ mensalidade.data_pagamento|date:"d/m/Y" }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td class="file-actions">
+                                {% if mensalidade.comprovante %}
+                                    <a href="{{ mensalidade.comprovante.url }}" target="_blank" class="comprovante-link">
+                                        Ver comprovante
+                                    </a>
+                                {% endif %}
+                                
+                                <form action="{% url 'upload_comprovante' mensalidade.id %}" 
+                                      method="post" 
+                                      enctype="multipart/form-data" 
+                                      id="form-{{ mensalidade.id }}">
+                                    {% csrf_token %}
+                                    <div class="upload-btn-wrapper">
+                                        <div class="file-upload">
+                                            <input type="file" 
+                                                   name="comprovante" 
+                                                   id="file-{{ mensalidade.id }}" 
+                                                   accept=".pdf,.jpg,.jpeg,.png"
+                                                   onchange="updateFileName({{ mensalidade.id }})">
+                                            <button type="button" class="btn btn-primary" onclick="document.getElementById('file-{{ mensalidade.id }}').click()">
+                                                {% if mensalidade.comprovante %}Substituir{% else %}Enviar{% endif %}
+                                            </button>
+                                        </div>
+                                        <div id="file-name-{{ mensalidade.id }}" class="file-name"></div>
+                                        <button type="submit" style="display: none;" id="submit-{{ mensalidade.id }}">Enviar</button>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="sem-registros">Não há mensalidades registradas.</div>
+        {% endif %}
+    </div>
+
+    <script>
+        function updateFileName(id) {
+            const input = document.getElementById(`file-${id}`);
+            const fileNameDiv = document.getElementById(`file-name-${id}`);
+            const submitBtn = document.getElementById(`submit-${id}`);
+            
+            if (input.files.length > 0) {
+                const fileName = input.files[0].name;
+                fileNameDiv.textContent = fileName.length > 15 ? fileName.substring(0, 12) + '...' : fileName;
+                fileNameDiv.style.display = 'block';
+                submitBtn.style.display = 'inline-block';
+                submitBtn.textContent = 'Confirmar';
+                submitBtn.className = 'btn btn-primary';
+                
+                // Auto-submit após selecionar o arquivo (opcional)
+                document.getElementById(`form-${id}`).submit();
+            } else {
+                fileNameDiv.style.display = 'none';
+                submitBtn.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

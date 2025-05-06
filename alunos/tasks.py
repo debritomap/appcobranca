@@ -3,19 +3,21 @@ from alunos.models import Mensalidade, ReguaCobranca
 from datetime import datetime, timedelta
 from pathlib import Path
 import environ, os, re, requests
+import sys, pika
+from django.core.signing import TimestampSigner
 
 @shared_task
 def regua_de_cobranca():
     hoje = datetime.now().date()
 
     # Buscar mensalidades ativas e ainda não pagas
-    mensalidades = Mensalidade.objects.exclude(status__in=['pago', 'comprovante_enviado'])
+    mensalidades = Mensalidade.objects.exclude(status__in=['pago', 'comprovante_enviado', 'inativo'])
 
     for mensalidade in mensalidades:
         for regua in ReguaCobranca.objects.all():
             dias_antes = timedelta(days=regua.dia_cobranca.dia)
-            if mensalidade.data_vencimento == hoje + (-dias_antes):
-                response = send_whatsapp_template(mensalidade)
+            if mensalidade.data_vencimento == hoje + (-dias_antes) or hoje > mensalidade.data_vencimento: 
+                response = _send_whatsapp_template(mensalidade)
                 if response.status_code == 200:
                     print(f"Mensagem enviada para {mensalidade.aluno.username} com sucesso.")
                 else:
@@ -24,7 +26,7 @@ def regua_de_cobranca():
     return "Régua de cobrança executada com sucesso."
 
 
-def send_whatsapp_template(mensalidade: Mensalidade):
+def _send_whatsapp_template(mensalidade: Mensalidade):
     whatsapp_url = _get_env_variable("WHATSAPP_URL")
     headers = _headers()
     data = _data(mensalidade)
@@ -64,6 +66,10 @@ def _data(mensalidade: Mensalidade):
     phone_number = "55" + re.sub(r'\D', '', mensalidade.aluno.whatsapp)
     language_code = _get_env_variable("LANGUAGE_CODE")
 
+    # Gerar token temporário seguro
+    signer = TimestampSigner()
+    token = signer.sign(str(mensalidade.aluno.id))
+    
     return {
         "messaging_product": "whatsapp",
         "to": phone_number,
@@ -78,8 +84,7 @@ def _data(mensalidade: Mensalidade):
                         { "type": "text", "text": mensalidade.aluno.username },
                         { "type": "text", "text": f"R$ {mensalidade.valor:.2f}" },
                         { "type": "text", "text": _mensagem_cobranca(mensalidade) },
-                        { "type": "text", "text": _get_env_variable("DOMINIO_SITE") },
-                        { "type": "text", "text": mensalidade.aluno.password },
+                        { "type": "text", "text": _get_env_variable("DOMINIO_SITE") + f"login/{token}/" },
                     ]
                 }
             ]
