@@ -215,7 +215,7 @@ def _data(mensalidade: Mensalidade):
                     "type": "body",
                     "parameters": [
                         { "type": "text", "text": mensalidade.aluno.username },
-                        { "type": "text", "text": f"R$ {mensalidade.valor:.2f}" },
+                        { "type": "text", "text": f"{mensalidade.valor:.2f}" },
                         { "type": "text", "text": _billing_message(mensalidade) },
                         { "type": "text", "text": _get_env_variable("DOMINIO_SITE") },
                         { "type": "text", "text": mensalidade.aluno.password },

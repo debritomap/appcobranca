@@ -7,16 +7,9 @@ from django.views.decorators.http import require_POST
 from django.http import Http404
 from django.contrib.auth.backends import ModelBackend
 from django.core.cache import cache
-from django.core.signing import TimestampSigner, SignatureExpired, BadSignature
-
-import uuid
-import re
-import os
-import logging
-
+import uuid, re, os, logging
 from .forms import LoginForm
-from .models import Aluno, Mensalidade, ReguaCobranca
-
+from .models import Mensalidade # ReguaCobranca, Aluno
 
 # Configurar logger
 logger = logging.getLogger(__name__)
@@ -151,34 +144,6 @@ def normalize_number(number):
         return ""
     return re.sub(r'\D', '', number)
 
-def auto_login(request, token):
-    """Processa login automático via token seguro"""
-    signer = TimestampSigner()
-    
-    try:
-        # Token válido por 30 dias (2.592.000 segundos)
-        aluno_id = signer.unsign(token, max_age=2592000)
-        
-        aluno = get_object_or_404(Aluno, id=aluno_id)
-        
-        # Registrar o acesso
-        logger.info(f"Login automático via token: {aluno.username}")
-        
-        # Autenticar o usuário
-        aluno.backend = 'django.contrib.auth.backends.ModelBackend'
-        auth_login(request, aluno)
-        
-        return redirect('area_logada')
-        
-    except SignatureExpired:
-        logger.warning(f"Tentativa de acesso com token expirado: {token}")
-        return render(request, 'index.html', {
-            'form': LoginForm(),
-            'error': 'O link de acesso expirou. Solicite um novo link.'
-        })
-    except (BadSignature, Aluno.DoesNotExist):
-        logger.warning(f"Tentativa de acesso com token inválido: {token}")
-        return render(request, 'index.html', {
-            'form': LoginForm(),
-            'error': 'Link de acesso inválido.'
-        })
+
+def terms_of_use_view(request):
+    return render(request, 'terms_of_use.html')
