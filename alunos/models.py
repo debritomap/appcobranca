@@ -86,4 +86,4 @@ class ReguaCobranca(models.Model):
     dia_cobranca = models.ForeignKey(Dia, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{-self.dia_cobranca} dias antes do vencimento"
+        return f"{self.dia_cobranca.dia} dias antes do vencimento"
